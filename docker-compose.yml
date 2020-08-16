@@ -1,0 +1,46 @@
+###############################################################################
+#                          Generated on phpdocker.io                          #
+###############################################################################
+version: "3.1"
+services:
+
+    memcached:
+      image: memcached:alpine
+      container_name: test-memcached
+
+    mysql:
+      image: mysql:8.0
+      container_name: test-mysql
+      working_dir: /application
+      volumes:
+        - .:/application
+      environment:
+        - MYSQL_ROOT_PASSWORD=crm2020!
+        - MYSQL_DATABASE=suitecrm
+        - MYSQL_USER=crm
+        - MYSQL_PASSWORD=crm2020!
+      ports:
+        - "1027:3306"
+
+    elasticsearch:
+      image: elasticsearch:6.5.4
+      container_name: test-elasticsearch
+
+    webserver:
+      image: nginx:alpine
+      container_name: test-webserver
+      working_dir: /application
+      volumes:
+          - .:/application
+          - ./phpdocker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      ports:
+       - "1025:80"
+
+    php-fpm:
+      build: phpdocker/php-fpm
+      container_name: test-php-fpm
+      working_dir: /application
+      volumes:
+        - .:/application
+        - ./phpdocker/php-fpm/php-ini-overrides.ini:/etc/php/7.4/fpm/conf.d/99-overrides.ini
+
